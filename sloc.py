@@ -17,7 +17,7 @@ Lines of comments: {comments}
 Lines of preprocessor: {pre}"""
 
 if len(sys.argv) < 2:
-    print("Usage: {} <files>".format(sys.argv[0]))
+    print("Usage: sloc <files>")
 
 total_lines = 0
 total_code = 0
@@ -44,6 +44,7 @@ for fname in sys.argv[1:]:
     num_files += 1
 
     with open(fname, "r") as f:
+        block_comment = False
         for line in f:
             line = line.strip()
 
@@ -57,7 +58,17 @@ for fname in sys.argv[1:]:
                     if line[0] == "#":
                         line_is_comment = True
                 elif mode == C:
-                    if line[:2] == "//":
+                    if block_comment:
+                        line_is_comment = True
+                        # TODO: Handle code on same line as block comment
+                        # /* stuff happens on this line */ code();
+                        if "*/" in line:
+                            block_comment = False
+                    elif line[:2] == "//":
+                        line_is_comment = True
+                    # TODO: Handle code on same line as block comment                        
+                    if "/*" in line:
+                        block_comment = True
                         line_is_comment = True
                     elif line[0] == "#":
                         line_is_preprocessor = True
