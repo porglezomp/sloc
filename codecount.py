@@ -26,9 +26,13 @@ total_comments = 0
 total_pre = 0
 
 num_files = 0
+skipped = []
 for fname in sys.argv[1:]:
     # Find the file extension and set the mode based on that
     extension = fname.split(".")[-1]
+    if extension not in modes:
+        skipped.append(fname)
+        continue
     mode = modes[extension]
 
     lines = 0
@@ -100,3 +104,15 @@ if num_files > 1:
         comments=total_comments,
         pre=total_pre
     ))
+
+if skipped:
+    print()
+    if len(skipped) == 1:
+        print("Skipped {}".format(skipped[0]))
+    else:
+        print("Skipped {} files:".format(len(skipped)))
+        for file in skipped:
+            print(file)
+    print("""The extensions are unrecognized. \
+Please file a report, or even better, contribute \
+code to handle these file types.""")
